@@ -31,7 +31,7 @@ MongoClient.connect(url)
 
 app.get('/', (req, res) => {
     res.send(`
-        <h1>Practice Task 10</h1>
+        <h1>Practice Task 11-12</h1>
         <ul>
             <li><a href="/api/products">All Products</a></li>
             <li><a href="/api/products/1">Product 1</a></li>
@@ -97,6 +97,12 @@ app.get('/api/products/:id', async (req, res) => {
     }
 });
 
+app.get('/version', (req, res) => {
+    res.json({
+        version: "1.1",
+        updatedAt: "2026-01-25"
+    });
+});
 
 
 app.post('/api/products', async (req, res) => {
