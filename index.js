@@ -170,6 +170,32 @@ app.post('/api/products', async (req, res) => {
     }
 });
 
+
+
+app.patch('/api/products/:id', async (req, res) => {
+    const id = req.params.id;
+    const updates = req.body; 
+
+    if (!ObjectId.isValid(id)) 
+        return res.status(400).json({ error: 'Invalid product ID' });
+    if (!updates || Object.keys(updates).length === 0) 
+        return res.status(400).json({ error: 'No fields to update' });
+
+    try {
+        const result = await productsCollection.updateOne(
+            { _id: new ObjectId(id) },
+            { $set: updates }
+        );
+
+        if (result.matchedCount === 0) return res.status(404).json({ error: 'Product not found' });
+
+        res.status(200).json({ message: 'Product updated successfully' });
+    } catch (err) {
+        res.status(500).json({ error: 'Server error' });
+    }
+});
+
+
 app.use((req, res) => {
     res.status(404).json({ error: 'API endpoint not found' });
 });
