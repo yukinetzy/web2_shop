@@ -104,6 +104,54 @@ app.get('/version', (req, res) => {
     });
 });
 
+app.put('/api/products/:id', async (req, res) => {
+    const id = req.params.id;
+    const { name, price, category } = req.body;
+
+    if (!ObjectId.isValid(id)) {
+        return res.status(400).json({ error: 'Invalid product ID' });
+    }
+
+    if (!name || !price || !category) {
+        return res.status(400).json({ error: 'Missing required fields' });
+    }
+
+    try {
+        const result = await productsCollection.updateOne(
+            { _id: new ObjectId(id) },
+            { $set: { name, price, category } }
+        );
+
+        if (result.matchedCount === 0) {
+            return res.status(404).json({ error: 'Product not found' });
+        }
+
+        res.json({ message: 'Product updated successfully' });
+    } catch (err) {
+        res.status(500).json({ error: 'Server error' });
+    }
+});
+
+app.delete('/api/products/:id', async (req, res) => {
+    const id = req.params.id;
+
+    if (!ObjectId.isValid(id)) {
+        return res.status(400).json({ error: 'Invalid product ID' });
+    }
+
+    try {
+        const result = await productsCollection.deleteOne({ _id: new ObjectId(id) });
+
+        if (result.deletedCount === 0) {
+            return res.status(404).json({ error: 'Product not found' });
+        }
+
+        res.json({ message: 'Product deleted successfully' });
+    } catch (err) {
+        res.status(500).json({ error: 'Server error' });
+    }
+});
+
 
 app.post('/api/products', async (req, res) => {
     const { name, price, category } = req.body;
