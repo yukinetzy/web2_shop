@@ -13,6 +13,14 @@ app.use((req, res, next) => {
 
 app.use(express.json());
 
+const apiKeyAuth = (req, res, next) => {
+    const apiKey = req.headers['x-api-key'];
+
+    if (!apiKey || apiKey !== process.env.API_KEY) {
+        return res.status(403).json({ error: 'Forbidden' });
+    }
+    next();
+}
 
 const url = process.env.MONGO_URI;
 
@@ -104,7 +112,7 @@ app.get('/version', (req, res) => {
     });
 });
 
-app.put('/api/products/:id', async (req, res) => {
+app.put('/api/products/:id', apiKeyAuth, async (req, res) => {
     const id = req.params.id;
     const { name, price, category } = req.body;
 
@@ -132,7 +140,7 @@ app.put('/api/products/:id', async (req, res) => {
     }
 });
 
-app.delete('/api/products/:id', async (req, res) => {
+app.delete('/api/products/:id', apiKeyAuth, async (req, res) => {
     const id = req.params.id;
 
     if (!ObjectId.isValid(id)) {
@@ -153,7 +161,7 @@ app.delete('/api/products/:id', async (req, res) => {
 });
 
 
-app.post('/api/products', async (req, res) => {
+app.post('/api/products', apiKeyAuth, async (req, res) => {
     const { name, price, category } = req.body;
 
     if (!name || !price || !category) {
@@ -172,7 +180,7 @@ app.post('/api/products', async (req, res) => {
 
 
 
-app.patch('/api/products/:id', async (req, res) => {
+app.patch('/api/products/:id', apiKeyAuth, async (req, res) => {
     const id = req.params.id;
     const updates = req.body; 
 
